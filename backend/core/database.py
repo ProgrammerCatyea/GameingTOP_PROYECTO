@@ -6,7 +6,6 @@ from backend.core.config import settings
 DATA_DIR = os.path.join("backend", "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
-
 DATABASE_URL = settings.DB_URL
 
 engine = create_engine(
