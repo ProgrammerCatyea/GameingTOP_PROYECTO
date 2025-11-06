@@ -7,10 +7,6 @@ STEAM_APPDETAILS_URL = "https://store.steampowered.com/api/appdetails?appids={ap
 
 
 def obtener_top_steam(limit: int = 25):
-    """
-    Devuelve una lista con los juegos más jugados de Steam (limit configurable).
-    Retorna una lista vacía si ocurre un error.
-    """
     try:
         response = requests.get(STEAM_TOP_URL, timeout=10)
         response.raise_for_status()
