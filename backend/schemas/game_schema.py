@@ -1,11 +1,11 @@
 from typing import List, Optional
 from pydantic import BaseModel
-from backend.schemas.category_schema import CategoriaBase
+from backend.schemas.category_schema import CategoryBase
 
-
-class JuegoBase(BaseModel):
+class GameBase(BaseModel):
     id: Optional[int] = None
-    appid: Optional[int] = None          
+    appid: Optional[int] = None
+    nombre: Optional[str] = None
     plataforma: Optional[str] = "Steam/PC"
     desarrollador: Optional[str] = None
     genero_principal: Optional[str] = None
@@ -13,25 +13,27 @@ class JuegoBase(BaseModel):
     class Config:
         from_attributes = True
 
-class JuegoDetail(JuegoBase):
-    categorias: List[CategoriaBase] = []
 
-class JuegoCreate(BaseModel):
+class GameDetail(GameBase):
+    categorias: List[CategoryBase] = []
+
+
+class GameCreate(BaseModel):
     nombre: str
     plataforma: Optional[str] = "Steam/PC"
     desarrollador: Optional[str] = None
     genero_principal: Optional[str] = None
-    categorias_ids: List[int] = []  
+    categorias_ids: List[int] = [] 
 
     class Config:
         from_attributes = True
 
-class JuegoUpdate(BaseModel):
+class GameUpdate(BaseModel):
     nombre: Optional[str] = None
     plataforma: Optional[str] = None
     desarrollador: Optional[str] = None
     genero_principal: Optional[str] = None
-    categorias_ids: Optional[List[int]] = None 
+    categorias_ids: Optional[List[int]] = None
 
     class Config:
         from_attributes = True

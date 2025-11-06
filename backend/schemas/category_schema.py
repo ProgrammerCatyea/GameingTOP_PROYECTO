@@ -1,10 +1,14 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
-class CategoriaBase(BaseModel):
+class CategoryBase(BaseModel):
     id: Optional[int] = None
     nombre: str
     descripcion: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+class CategoryDetail(CategoryBase):
+    juegos: Optional[List[str]] = None  # para mostrar nombres de juegos asociados
+
