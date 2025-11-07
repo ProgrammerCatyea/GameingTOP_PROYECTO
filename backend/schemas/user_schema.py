@@ -1,6 +1,7 @@
 from typing import Optional, List
 from pydantic import BaseModel
 
+
 class UserBase(BaseModel):
     id: Optional[int] = None
     nombre: str
@@ -10,6 +11,7 @@ class UserBase(BaseModel):
     class Config:
         from_attributes = True
 
+
 class UserDetail(UserBase):
-    rankings: Optional[List[str]] = None  
-    juegos: Optional[List[str]] = None    
+    rankings: Optional[List[str]] = None
+    juegos: Optional[List[str]] = None

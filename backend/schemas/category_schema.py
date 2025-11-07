@@ -10,5 +10,4 @@ class CategoryBase(BaseModel):
         from_attributes = True
 
 class CategoryDetail(CategoryBase):
-    juegos: Optional[List[str]] = None  # para mostrar nombres de juegos asociados
-
+    juegos: Optional[List[str]] = None

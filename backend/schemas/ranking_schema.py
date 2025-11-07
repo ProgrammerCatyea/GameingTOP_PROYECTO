@@ -6,12 +6,12 @@ class RankingBase(BaseModel):
     id: Optional[int] = None
     nombre: str
     descripcion: Optional[str] = None
-    tipo: Optional[str] = "global" 
+    tipo: Optional[str] = "global"
     usuario_id: Optional[int] = None
 
     class Config:
         from_attributes = True
 
-class RankingDetail(RankingBase):
-    juegos: List[GameBase] = [] 
 
+class RankingDetail(RankingBase):
+    juegos: List[GameBase] = []
