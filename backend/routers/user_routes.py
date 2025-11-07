@@ -2,59 +2,62 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from backend.core.dependencies import get_database
-from backend.models.user import Usuario
-from backend.schemas.user_schema import UsuarioBase
+from backend.models.user import User
+from backend.schemas.user_schema import UserBase
 
 router = APIRouter(
     prefix="/api/v1/users",
     tags=["Users"]
 )
 
-@router.get("/", response_model=List[UsuarioBase])
-def listar_usuarios(db: Session = Depends(get_database)):
-    usuarios = db.query(Usuario).all()
-    return usuarios
 
-@router.get("/{usuario_id}", response_model=UsuarioBase)
-def obtener_usuario(usuario_id: int, db: Session = Depends(get_database)):
-    usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
-    if not usuario:
+@router.get("/", response_model=List[UserBase])
+def list_users(db: Session = Depends(get_database)):
+    users = db.query(User).all()
+    return users
+
+
+@router.get("/{usuario_id}", response_model=UserBase)
+def get_user(usuario_id: int, db: Session = Depends(get_database)):
+    user = db.query(User).filter(User.id == usuario_id).first()
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
+            detail="User not found"
         )
-    return usuario
+    return user
 
 
-@router.post("/", response_model=UsuarioBase, status_code=status.HTTP_201_CREATED)
-def crear_usuario(payload: UsuarioBase, db: Session = Depends(get_database)):
+@router.post("/", response_model=UserBase, status_code=status.HTTP_201_CREATED)
+def create_user(payload: UserBase, db: Session = Depends(get_database)):
     if payload.nickname:
-        existe = db.query(Usuario).filter(Usuario.nickname == payload.nickname).first()
-        if existe:
+        existing = db.query(User).filter(User.nickname == payload.nickname).first()
+        if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Ya existe un usuario con ese nickname"
+                detail="A user with this nickname already exists"
             )
 
-    nuevo = Usuario(
+    new_user = User(
         nombre=payload.nombre,
         nickname=payload.nickname,
         pais=payload.pais
     )
-    db.add(nuevo)
+    db.add(new_user)
     db.commit()
-    db.refresh(nuevo)
-    return nuevo
+    db.refresh(new_user)
+    return new_user
+
 
 @router.delete("/{usuario_id}", status_code=status.HTTP_204_NO_CONTENT)
-def eliminar_usuario(usuario_id: int, db: Session = Depends(get_database)):
-    usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
-    if not usuario:
+def delete_user(usuario_id: int, db: Session = Depends(get_database)):
+    user = db.query(User).filter(User.id == usuario_id).first()
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
+            detail="User not found"
         )
 
-    db.delete(usuario)
+    db.delete(user)
     db.commit()
     return None
