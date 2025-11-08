@@ -13,6 +13,7 @@ app = FastAPI(
     description="API para visualizar y gestionar tendencias de videojuegos en Steam y rankings personalizados.",
 )
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -21,9 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 Base.metadata.create_all(bind=engine)
-
 app.include_router(games_router, prefix="/api/v1/games", tags=["Games"])
 app.include_router(categories_router, prefix="/api/v1/categories", tags=["Categories"])
 app.include_router(rankings_router, prefix="/api/v1/rankings", tags=["Rankings"])
@@ -32,7 +31,8 @@ app.include_router(steam_router, prefix="/api/v1/steam", tags=["Steam"])
 
 @app.get("/health", tags=["Status"])
 def healthcheck():
+  
     return {
         "status": "ok",
-        "mensaje": "✅ Backend de GameingTOP funcionando correctamente",
+        "mensaje": " Backend de GameingTOP funcionando correctamente",
     }

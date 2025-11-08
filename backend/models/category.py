@@ -5,7 +5,6 @@ from backend.models.associations import game_category
 
 
 class Category(Base):
-
     __tablename__ = "categorias"
 
     id = Column(Integer, primary_key=True, index=True)

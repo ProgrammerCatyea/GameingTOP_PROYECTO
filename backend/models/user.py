@@ -3,8 +3,7 @@ from sqlalchemy.orm import relationship
 from backend.core.database import Base
 
 
-class Usuario(Base):
-
+class User(Base):
     __tablename__ = "usuarios"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -14,15 +13,16 @@ class Usuario(Base):
 
     rankings = relationship(
         "Ranking",
-        back_populates="usuario",
+        back_populates="user",
         cascade="all, delete-orphan"
     )
 
-    juegos = relationship(
-        "Juego",
-        back_populates="usuario",
+    games = relationship(
+        "Game",
+        back_populates="user",
         cascade="all, delete-orphan"
     )
 
     def __repr__(self):
-        return f"<Usuario(nombre='{self.nombre}', nickname='{self.nickname}', pais='{self.pais}')>"
+        return f"<User(nombre='{self.nombre}', nickname='{self.nickname}', pais='{self.pais}')>"
+

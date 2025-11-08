@@ -7,6 +7,7 @@ game_category = Table(
     Column("juego_id", Integer, ForeignKey("juegos.id"), primary_key=True),
     Column("categoria_id", Integer, ForeignKey("categorias.id"), primary_key=True)
 )
+
 ranking_game = Table(
     "ranking_juego",
     Base.metadata,
