@@ -1,57 +1,82 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+
 from backend.core.dependencies import get_database
 from backend.models.category import Category
-from backend.schemas.category_schema import CategoryBase
-
-router = APIRouter(
-    prefix="/api/v1/categories",
-    tags=["Categories"]
+from backend.schemas.category_schema import (
+    CategoryBase,
+    CategoryDetail,
+    CategoryCreate,
+    CategoryUpdate
 )
 
-@router.get("/", response_model=List[CategoryBase])
+router = APIRouter()
+
+
+@router.get("/", response_model=List[CategoryDetail])
 def list_categories(db: Session = Depends(get_database)):
-    categories = db.query(Category).all()
-    return categories
+    categorias = db.query(Category).all()
+    return categorias
 
 
-@router.get("/{categoria_id}", response_model=CategoryBase)
+@router.get("/{categoria_id}", response_model=CategoryDetail)
 def get_category(categoria_id: int, db: Session = Depends(get_database)):
-    category = db.query(Category).filter(Category.id == categoria_id).first()
-    if not category:
+    categoria = db.query(Category).filter(Category.id == categoria_id).first()
+    if not categoria:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found"
+            detail="La categoría no existe."
         )
-    return category
+    return categoria
 
 
-@router.post("/", response_model=CategoryBase, status_code=status.HTTP_201_CREATED)
-def create_category(payload: CategoryBase, db: Session = Depends(get_database)):
-    existing = db.query(Category).filter(Category.nombre == payload.nombre).first()
-    if existing:
+@router.post("/", response_model=CategoryDetail, status_code=status.HTTP_201_CREATED)
+def create_category(payload: CategoryCreate, db: Session = Depends(get_database)):
+    existe = db.query(Category).filter(Category.nombre == payload.nombre).first()
+    if existe:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A category with this name already exists"
+            detail="Ya existe una categoría con ese nombre."
         )
 
-    new_category = Category(nombre=payload.nombre, descripcion=payload.descripcion)
-    db.add(new_category)
+    nueva = Category(nombre=payload.nombre, descripcion=payload.descripcion)
+    db.add(nueva)
     db.commit()
-    db.refresh(new_category)
-    return new_category
+    db.refresh(nueva)
+    return nueva
+
+
+@router.put("/{categoria_id}", response_model=CategoryDetail)
+def update_category(categoria_id: int, payload: CategoryUpdate, db: Session = Depends(get_database)):
+    categoria = db.query(Category).filter(Category.id == categoria_id).first()
+
+    if not categoria:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="La categoría no existe."
+        )
+
+    if payload.nombre is not None:
+        categoria.nombre = payload.nombre
+    if payload.descripcion is not None:
+        categoria.descripcion = payload.descripcion
+
+    db.commit()
+    db.refresh(categoria)
+    return categoria
 
 
 @router.delete("/{categoria_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(categoria_id: int, db: Session = Depends(get_database)):
-    category = db.query(Category).filter(Category.id == categoria_id).first()
-    if not category:
+    categoria = db.query(Category).filter(Category.id == categoria_id).first()
+
+    if not categoria:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found"
+            detail="La categoría no existe."
         )
 
-    db.delete(category)
+    db.delete(categoria)
     db.commit()
     return None
