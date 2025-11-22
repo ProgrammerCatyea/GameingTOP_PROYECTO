@@ -13,23 +13,21 @@ class Game(Base):
     plataforma = Column(String(100), nullable=True)
     desarrollador = Column(String(150), nullable=True)
     genero_principal = Column(String(100), nullable=True)
-
-
     user_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
     user = relationship("User", back_populates="games")
 
- 
     categories = relationship(
         "Category",
         secondary=game_category,
         back_populates="games",
+        lazy="joined"
     )
-
     rankings = relationship(
         "Ranking",
         secondary=ranking_game,
         back_populates="games",
         viewonly=False,
+        lazy="joined"
     )
 
     def __repr__(self):

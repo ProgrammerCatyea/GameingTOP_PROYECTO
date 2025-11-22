@@ -14,7 +14,8 @@ class Category(Base):
     games = relationship(
         "Game",
         secondary=game_category,
-        back_populates="categories"
+        back_populates="categories",
+        lazy="joined"  
     )
 
     def __repr__(self):

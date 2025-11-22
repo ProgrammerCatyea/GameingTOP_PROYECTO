@@ -8,9 +8,20 @@ from backend.routers.user_routes import router as usuarios_router
 from backend.routers.steam_routes import router as steam_router
 
 app = FastAPI(
-    title="GameingTOP API",
+    title=" GameingTOP - Sistema de Gestión y Tendencias de Videojuegos",
     version="1.0.0",
-    description="API para visualizar y analizar tendencias de videojuegos en Steam."
+    description="""
+    Esta API permite gestionar y analizar información de videojuegos, jugadores, categorías y rankings
+    sincronizados con Steam.
+
+    Desarrollado por: Nicolás Lozano Díaz  
+    Tecnologías: FastAPI · SQLAlchemy · SQLite · Pydantic  
+    Objetivo:** Visualizar, crear y relacionar datos de videojuegos populares.
+    """,
+    contact={
+        "name": "Nicolás Lozano Díaz",
+        "email": "nicolas.lozano@ejemplo.com",
+    },
 )
 
 app.add_middleware(
@@ -23,12 +34,17 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
-app.include_router(juegos_router, prefix="/api/v1/juegos", tags=[" Juegos"])
-app.include_router(categorias_router, prefix="/api/v1/categorias", tags=[" Categorías"])
-app.include_router(rankings_router, prefix="/api/v1/rankings", tags=[" Rankings"])
-app.include_router(usuarios_router, prefix="/api/v1/usuarios", tags=[" Usuarios"])
-app.include_router(steam_router, prefix="/api/v1/steam", tags=[" Steam"])
+app.include_router(juegos_router, prefix="/juegos", tags=["Juegos"])
+app.include_router(categorias_router, prefix="/categorias", tags=["Categorías"])
+app.include_router(rankings_router, prefix="/rankings", tags=["ankings"])
+app.include_router(usuarios_router, prefix="/usuarios", tags=["Usuarios"])
+app.include_router(steam_router, prefix="/steam", tags=["Steam - Sincronización"])
 
-@app.get("/estado", tags=["Estado"])
-def healthcheck():
-    return {"status": "ok", "mensaje": "Backend de GameingTOP funcionando correctamente"}
+@app.get("/", tags=[" Estado del Servidor"])
+def inicio():
+    return {
+        "status": "ok",
+        "mensaje": "Backend GameingTOP operativo correctamente",
+        "autor": "Nicolás Lozano Díaz",
+        "version": "1.0.0"
+    }
