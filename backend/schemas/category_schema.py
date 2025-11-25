@@ -1,6 +1,5 @@
-from typing import Optional, List
+from typing import Optional
 from pydantic import BaseModel
-from backend.schemas.game_schema import GameBase
 
 
 class CategoryBase(BaseModel):
@@ -12,8 +11,10 @@ class CategoryBase(BaseModel):
         from_attributes = True
 
 
+
 class CategoryDetail(CategoryBase):
-    juegos: List[GameBase] = []
+    pass
+
 
 
 class CategoryCreate(BaseModel):
@@ -30,3 +31,4 @@ class CategoryUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
