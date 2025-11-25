@@ -6,19 +6,17 @@ from backend.models.ranking import Ranking
 from backend.models.user import User
 from backend.models.game import Game
 from backend.models.associations import ranking_game
-from backend.schemas.ranking_schema import (
-    RankingDetail,
-    RankingCreate,
-    RankingUpdate,
-)
+from backend.schemas.ranking_schema import RankingBase, RankingDetail
 
-router = APIRouter()
+router = APIRouter(
+    prefix="",
+    tags=["Rankings"]
+)
 
 
 @router.get("/", response_model=List[RankingDetail])
 def list_rankings(db: Session = Depends(get_database)):
-    rankings = db.query(Ranking).all()
-    return rankings
+    return db.query(Ranking).all()
 
 
 @router.get("/{ranking_id}", response_model=RankingDetail)
@@ -27,27 +25,27 @@ def get_ranking(ranking_id: int, db: Session = Depends(get_database)):
     if not ranking:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="El ranking no existe.",
+            detail="Ranking not found"
         )
     return ranking
 
 
 @router.post("/", response_model=RankingDetail, status_code=status.HTTP_201_CREATED)
-def create_ranking(payload: RankingCreate, db: Session = Depends(get_database)):
+def create_ranking(payload: RankingBase, db: Session = Depends(get_database)):
     user = None
-    if payload.user_id is not None:
-        user = db.query(User).filter(User.id == payload.user_id).first()
+    if payload.id:
+        user = db.query(User).filter(User.id == payload.id).first()
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="El usuario asociado no existe.",
+                detail="User not found"
             )
 
     new_ranking = Ranking(
         nombre=payload.nombre,
         descripcion=payload.descripcion,
         tipo=payload.tipo,
-        user=user,
+        user=user
     )
 
     db.add(new_ranking)
@@ -56,66 +54,27 @@ def create_ranking(payload: RankingCreate, db: Session = Depends(get_database)):
     return new_ranking
 
 
-@router.put("/{ranking_id}", response_model=RankingDetail)
-def update_ranking(
-    ranking_id: int,
-    payload: RankingUpdate,
-    db: Session = Depends(get_database),
-):
-    ranking = db.query(Ranking).filter(Ranking.id == ranking_id).first()
-    if not ranking:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El ranking no existe.",
-        )
-
-    if payload.nombre is not None:
-        ranking.nombre = payload.nombre
-    if payload.descripcion is not None:
-        ranking.descripcion = payload.descripcion
-    if payload.tipo is not None:
-        ranking.tipo = payload.tipo
-    if payload.user_id is not None:
-        user = db.query(User).filter(User.id == payload.user_id).first()
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="El usuario asociado no existe.",
-            )
-        ranking.user = user
-
-    db.commit()
-    db.refresh(ranking)
-    return ranking
-
-
 @router.post("/{ranking_id}/add_game/{juego_id}", response_model=RankingDetail)
 def add_game_to_ranking(
     ranking_id: int,
     juego_id: int,
     posicion: Optional[int] = None,
     score: Optional[float] = None,
-    db: Session = Depends(get_database),
+    nota: Optional[str] = None,
+    db: Session = Depends(get_database)
 ):
     ranking = db.query(Ranking).filter(Ranking.id == ranking_id).first()
     game = db.query(Game).filter(Game.id == juego_id).first()
 
     if not ranking:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El ranking no existe.",
-        )
+        raise HTTPException(status_code=404, detail="Ranking not found")
     if not game:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El juego no existe.",
-        )
+        raise HTTPException(status_code=404, detail="Game not found")
 
-    # Evitar duplicados
     if any(g.id == game.id for g in ranking.games):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El juego ya está asociado a este ranking.",
+            detail="The game is already in this ranking"
         )
 
     db.execute(
@@ -124,6 +83,7 @@ def add_game_to_ranking(
             juego_id=game.id,
             posicion=posicion,
             score=score,
+            nota=nota
         )
     )
 
@@ -133,24 +93,14 @@ def add_game_to_ranking(
 
 
 @router.delete("/{ranking_id}/game/{juego_id}", response_model=RankingDetail)
-def remove_game_from_ranking(
-    ranking_id: int,
-    juego_id: int,
-    db: Session = Depends(get_database),
-):
+def remove_game_from_ranking(ranking_id: int, juego_id: int, db: Session = Depends(get_database)):
     ranking = db.query(Ranking).filter(Ranking.id == ranking_id).first()
     if not ranking:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El ranking no existe.",
-        )
+        raise HTTPException(status_code=404, detail="Ranking not found")
 
     game = db.query(Game).filter(Game.id == juego_id).first()
     if not game:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El juego no existe.",
-        )
+        raise HTTPException(status_code=404, detail="Game not found")
 
     db.execute(
         ranking_game.delete().where(
@@ -167,10 +117,7 @@ def remove_game_from_ranking(
 def delete_ranking(ranking_id: int, db: Session = Depends(get_database)):
     ranking = db.query(Ranking).filter(Ranking.id == ranking_id).first()
     if not ranking:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El ranking no existe.",
-        )
+        raise HTTPException(status_code=404, detail="Ranking not found")
 
     db.delete(ranking)
     db.commit()
