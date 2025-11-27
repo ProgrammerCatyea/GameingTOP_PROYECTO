@@ -1,5 +1,5 @@
 const API_BASE_URL = "http://127.0.0.1:8000";
-const GAMES_ENDPOINT = `${API_BASE_URL}/games`; 
+const GAMES_ENDPOINT = `${API_BASE_URL}/juegos`;
 const gameForm = document.getElementById("game-form");
 const gameIdInput = document.getElementById("game-id");
 const nombreInput = document.getElementById("nombre");
@@ -15,7 +15,6 @@ const gamesEmptyText = document.getElementById("games-empty-text");
 const btnReload = document.getElementById("btn-reload");
 const btnClearForm = document.getElementById("btn-clear-form");
 const btnSubmit = document.getElementById("btn-submit");
-
 
 
 function showToast(message, type = "success", container = formToastContainer) {
@@ -85,7 +84,7 @@ function renderGames(games) {
       desarrollador,
       genero_principal,
       categorias,
-      user_id
+      user_id,
     } = game;
 
     const tr = document.createElement("tr");
@@ -238,7 +237,6 @@ btnClearForm.addEventListener("click", () => {
   clearForm();
 });
 
-
 gamesTableBody.addEventListener("click", async (e) => {
   const button = e.target.closest("button");
   if (!button) return;
@@ -274,7 +272,6 @@ async function handleEditClick(id) {
       throw new Error("No se pudo cargar la información del juego.");
     }
     const game = await res.json();
-
 
     gameIdInput.value = game.id ?? "";
     nombreInput.value = game.nombre ?? "";
