@@ -35,6 +35,24 @@ function showUserToast(message, type = "success") {
   }, 3500);
 }
 
+function setFormToCreateMode() {
+  userFormModeLabel.textContent = "Modo: creación";
+  userFormModeLabel.classList.remove("badge-soft");
+  userFormModeLabel.classList.add("badge-pill");
+
+  btnSubmitUser.textContent = "Guardar usuario";
+  btnSubmitUser.classList.remove("btn-edit-mode");
+}
+
+function setFormToEditMode() {
+  userFormModeLabel.textContent = "Modo: edición";
+  userFormModeLabel.classList.remove("badge-pill");
+  userFormModeLabel.classList.add("badge-soft");
+
+  btnSubmitUser.textContent = "Actualizar usuario";
+  btnSubmitUser.classList.add("btn-edit-mode");
+}
+
 function clearUserForm() {
   userIdInput.value = "";
   userNombreInput.value = "";
@@ -44,10 +62,7 @@ function clearUserForm() {
   userEdadInput.value = "";
   userNivelInput.value = "";
 
-  userFormModeLabel.textContent = "Modo: creación";
-  userFormModeLabel.classList.remove("badge-soft");
-  userFormModeLabel.classList.add("badge-pill");
-  btnSubmitUser.textContent = "Guardar usuario";
+  setFormToCreateMode();
 }
 
 
@@ -83,7 +98,7 @@ function renderUsers(users) {
       email,
       pais,
       edad,
-      nivel,
+      nivel_rol,
     } = user;
 
     const tr = document.createElement("tr");
@@ -94,7 +109,7 @@ function renderUsers(users) {
       <td>${email ?? "-"}</td>
       <td>${pais ?? "-"}</td>
       <td>${edad ?? "-"}</td>
-      <td>${nivel ?? "-"}</td>
+      <td>${nivel_rol ?? "-"}</td>
       <td>
         <div class="table-actions">
           <button class="btn btn-sm btn-outline" data-action="edit-user" data-id="${id}">
@@ -117,7 +132,7 @@ function buildUserPayload() {
     email: userEmailInput.value.trim() || null,
     pais: userPaisInput.value.trim() || null,
     edad: userEdadInput.value ? Number(userEdadInput.value) : null,
-    nivel: userNivelInput.value.trim() || null,
+    nivel_rol: userNivelInput.value.trim() || null,
   };
 }
 
@@ -249,12 +264,9 @@ async function handleEditUserClick(id) {
     userEmailInput.value = user.email ?? "";
     userPaisInput.value = user.pais ?? "";
     userEdadInput.value = user.edad ?? "";
-    userNivelInput.value = user.nivel ?? "";
+    userNivelInput.value = user.nivel_rol ?? "";
 
-    userFormModeLabel.textContent = "Modo: edición";
-    userFormModeLabel.classList.remove("badge-pill");
-    userFormModeLabel.classList.add("badge-soft");
-    btnSubmitUser.textContent = "Actualizar usuario";
+    setFormToEditMode();
     showUserToast("Editando usuario. Modifica los campos y guarda.");
   } catch (error) {
     console.error(error);
@@ -262,7 +274,9 @@ async function handleEditUserClick(id) {
   }
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
   clearUserForm();
   fetchUsers();
 });
+
