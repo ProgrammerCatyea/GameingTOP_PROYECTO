@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>GameingTOP | Rankings</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="app-shell">
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-brand">
+        <div class="navbar-logo"></div>
+        <div>
+          <div class="navbar-title">GameingTOP</div>
+          <div class="navbar-subtitle">Neon Control Panel</div>
+        </div>
+      </div>
+      <nav class="navbar-links">
+        <a href="index.html" class="nav-link">Dashboard</a>
+        <a href="game.html" class="nav-link">Juegos</a>
+        <a href="user.html" class="nav-link">Usuarios</a>
+        <a href="top.html" class="nav-link active">Rankings</a>
+        <a href="steam.html" class="nav-link">Steam</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <main class="app-main">
+    <section class="page-header">
+      <div class="page-title-block">
+        <span class="page-eyebrow">Módulo</span>
+        <h1 class="page-title">Gestión de Rankings</h1>
+        <p class="page-subtitle">
+          Administra tablas de posiciones vinculando usuarios y juegos, con puntajes y posiciones.
+        </p>
+      </div>
+      <div>
+        <button id="btn-clear-form-ranking" class="btn btn-outline btn-lg">
+          Limpiar formulario
+        </button>
+      </div>
+    </section>
+
+   
+    <section class="grid-2">
+     
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Ranking</h2>
+            <p class="card-subtitle">
+              Crea o actualiza una entrada de ranking asociando un juego, un usuario y su puntaje.
+            </p>
+          </div>
+          <span class="badge badge-pill" id="ranking-form-mode-label">
+            Modo: creación
+          </span>
+        </header>
+
+        <div class="card-body">
+          <form id="ranking-form" class="form-grid">
+       
+            <input type="hidden" id="ranking-id" />
+
+            <div class="form-group">
+              <label for="ranking-game" class="form-label">Juego *</label>
+              <select id="ranking-game">
+            
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ranking-user" class="form-label">Usuario *</label>
+              <select id="ranking-user">
+        
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ranking-score" class="form-label">Puntaje</label>
+              <input
+                type="number"
+                id="ranking-score"
+                placeholder="Ej: 1200"
+                min="0"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="ranking-position" class="form-label">Posición</label>
+              <input
+                type="number"
+                id="ranking-position"
+                placeholder="Ej: 1"
+                min="1"
+              />
+            </div>
+
+            <div class="form-group mt-2">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg glow-pulse"
+                id="btn-submit-ranking"
+              >
+                Guardar ranking
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-2" id="ranking-form-toast-container"></div>
+        </div>
+      </article>
+
+    
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Listado de Rankings</h2>
+            <p class="card-subtitle">
+              Visualiza, edita o elimina las posiciones registradas para los distintos juegos.
+            </p>
+          </div>
+          <button id="btn-reload-rankings" class="btn btn-ghost btn-sm">
+            Recargar
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Juego</th>
+                  <th>Usuario</th>
+                  <th>Puntaje</th>
+                  <th>Posición</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="rankings-table-body">
+        
+              </tbody>
+            </table>
+          </div>
+
+          <p
+            class="mt-2 text-muted"
+            id="rankings-empty-text"
+            style="display: none;"
+          >
+            No hay rankings registrados todavía. Crea el primero desde el formulario.
+          </p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="../js/ranking.js"></script>
+</body>
+</html>
