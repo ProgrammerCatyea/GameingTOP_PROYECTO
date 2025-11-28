@@ -305,3 +305,4 @@ document.addEventListener("DOMContentLoaded", () => {
   clearForm();
   fetchGames();
 });
+

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>GameingTOP | Usuarios</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="app-shell">
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-brand">
+        <div class="navbar-logo"></div>
+        <div>
+          <div class="navbar-title">GameingTOP</div>
+          <div class="navbar-subtitle">Neon Control Panel</div>
+        </div>
+      </div>
+      <nav class="navbar-links">
+        <a href="index.html" class="nav-link">Dashboard</a>
+        <a href="game.html" class="nav-link">Juegos</a>
+        <a href="user.html" class="nav-link active">Usuarios</a>
+        <a href="top.html" class="nav-link">Rankings</a>
+        <a href="steam.html" class="nav-link">Steam</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="page-header">
+      <div class="page-title-block">
+        <span class="page-eyebrow">Módulo</span>
+        <h1 class="page-title">Gestión de Usuarios</h1>
+        <p class="page-subtitle">
+          Crea, edita y administra los usuarios asociados a los juegos y rankings del sistema.
+        </p>
+      </div>
+      <div>
+        <button id="btn-clear-form-user" class="btn btn-outline btn-lg">
+          Limpiar formulario
+        </button>
+      </div>
+    </section>
+
+
+    <section class="grid-2">
+     
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Usuario</h2>
+            <p class="card-subtitle">
+              Completa los campos y guarda para crear o actualizar un usuario.
+            </p>
+          </div>
+          <span class="badge badge-pill" id="user-form-mode-label">
+            Modo: creación
+          </span>
+        </header>
+
+        <div class="card-body">
+          <form id="user-form" class="form-grid">
+           
+            <input type="hidden" id="user-id" />
+
+            <div class="form-group">
+              <label for="user-nombre" class="form-label">Nombre *</label>
+              <input
+                type="text"
+                id="user-nombre"
+                placeholder="Ej: Nicolás"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="user-nickname" class="form-label">Nickname</label>
+              <input
+                type="text"
+                id="user-nickname"
+                placeholder="Ej: NeonSlayer_07"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="user-email" class="form-label">Email</label>
+              <input
+                type="email"
+                id="user-email"
+                placeholder="Ej: nico@example.com"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="user-pais" class="form-label">País</label>
+              <input
+                type="text"
+                id="user-pais"
+                placeholder="Colombia, México, Argentina..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="user-edad" class="form-label">Edad</label>
+              <input
+                type="number"
+                id="user-edad"
+                min="10"
+                max="120"
+                placeholder="Ej: 21"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="user-nivel" class="form-label">Nivel / Rol</label>
+              <input
+                type="text"
+                id="user-nivel"
+                placeholder="Jugador, Admin, Pro, Casual..."
+              />
+            </div>
+
+            <div class="form-group mt-2">
+              <button type="submit" class="btn btn-primary btn-lg glow-pulse" id="btn-submit-user">
+                Guardar usuario
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-2" id="user-form-toast-container"></div>
+        </div>
+      </article>
+
+      
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Listado de Usuarios</h2>
+            <p class="card-subtitle">
+              Visualiza, edita o elimina los usuarios registrados en el sistema.
+            </p>
+          </div>
+          <button id="btn-reload-users" class="btn btn-ghost btn-sm">
+            Recargar
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Nickname</th>
+                  <th>Email</th>
+                  <th>País</th>
+                  <th>Edad</th>
+                  <th>Nivel / Rol</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-2 text-muted" id="users-empty-text" style="display:none;">
+            No hay usuarios registrados todavía. Crea el primero desde el formulario.
+          </p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="../js/user.js"></script>
+</body>
+</html>
