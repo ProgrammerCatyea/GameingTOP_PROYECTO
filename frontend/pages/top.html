@@ -25,14 +25,13 @@
     </div>
   </header>
 
-
   <main class="app-main">
     <section class="page-header">
       <div class="page-title-block">
         <span class="page-eyebrow">Módulo</span>
         <h1 class="page-title">Gestión de Rankings</h1>
         <p class="page-subtitle">
-          Administra tablas de posiciones vinculando usuarios y juegos, con puntajes y posiciones.
+          Crea y administra listas de juegos (rankings) asociadas a un usuario y un tipo de clasificación.
         </p>
       </div>
       <div>
@@ -42,15 +41,13 @@
       </div>
     </section>
 
-   
     <section class="grid-2">
-     
       <article class="card">
         <header class="card-header">
           <div>
             <h2 class="card-title">Ranking</h2>
             <p class="card-subtitle">
-              Crea o actualiza una entrada de ranking asociando un juego, un usuario y su puntaje.
+              Completa los campos para crear o actualizar un ranking. Luego podrás asociar juegos desde el backend o futuras funciones.
             </p>
           </div>
           <span class="badge badge-pill" id="ranking-form-mode-label">
@@ -60,41 +57,39 @@
 
         <div class="card-body">
           <form id="ranking-form" class="form-grid">
-       
             <input type="hidden" id="ranking-id" />
 
             <div class="form-group">
-              <label for="ranking-game" class="form-label">Juego *</label>
-              <select id="ranking-game">
-            
+              <label for="ranking-nombre" class="form-label">Nombre del ranking *</label>
+              <input
+                type="text"
+                id="ranking-nombre"
+                placeholder="Ej: Top RPG 2025"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="ranking-descripcion" class="form-label">Descripción</label>
+              <input
+                type="text"
+                id="ranking-descripcion"
+                placeholder="Ej: Mejores RPG según la comunidad"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="ranking-tipo" class="form-label">Tipo</label>
+              <select id="ranking-tipo">
+                <option value="global">Global</option>
+                <option value="evento">Evento</option>
+                <option value="personal">Personal</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="ranking-user" class="form-label">Usuario *</label>
+              <label for="ranking-user" class="form-label">Usuario creador (opcional)</label>
               <select id="ranking-user">
-        
               </select>
-            </div>
-
-            <div class="form-group">
-              <label for="ranking-score" class="form-label">Puntaje</label>
-              <input
-                type="number"
-                id="ranking-score"
-                placeholder="Ej: 1200"
-                min="0"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="ranking-position" class="form-label">Posición</label>
-              <input
-                type="number"
-                id="ranking-position"
-                placeholder="Ej: 1"
-                min="1"
-              />
             </div>
 
             <div class="form-group mt-2">
@@ -112,13 +107,12 @@
         </div>
       </article>
 
-    
       <article class="card">
         <header class="card-header">
           <div>
             <h2 class="card-title">Listado de Rankings</h2>
             <p class="card-subtitle">
-              Visualiza, edita o elimina las posiciones registradas para los distintos juegos.
+              Visualiza, edita o elimina los rankings registrados. Cada uno puede contener varios juegos.
             </p>
           </div>
           <button id="btn-reload-rankings" class="btn btn-ghost btn-sm">
@@ -132,15 +126,14 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Juego</th>
+                  <th>Nombre</th>
+                  <th>Tipo</th>
                   <th>Usuario</th>
-                  <th>Puntaje</th>
-                  <th>Posición</th>
+                  <th># Juegos</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="rankings-table-body">
-        
               </tbody>
             </table>
           </div>

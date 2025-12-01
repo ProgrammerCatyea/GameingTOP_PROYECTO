@@ -120,7 +120,6 @@ function renderRankings(rankings) {
 
     const numGames = Array.isArray(games) ? games.length : 0;
 
-
     let userLabel = "-";
     if (rk.user?.nickname || rk.user?.nombre) {
       userLabel = rk.user.nickname ?? rk.user.nombre;
@@ -301,9 +300,9 @@ async function handleEditRankingClick(id) {
   }
 }
 
+
 document.addEventListener("DOMContentLoaded", async () => {
   clearRankingForm();
   await fetchUsersForSelect();
   await fetchRankings();
 });
-
