@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>GameingTOP | Juegos</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="app-shell">
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-brand">
+        <div class="navbar-logo"></div>
+        <div>
+          <div class="navbar-title">GameingTOP</div>
+          <div class="navbar-subtitle">Neon Control Panel</div>
+        </div>
+      </div>
+      <nav class="navbar-links">
+        <a href="index.html" class="nav-link">Dashboard</a>
+        <a href="game.html" class="nav-link active">Juegos</a>
+        <a href="user.html" class="nav-link">Usuarios</a>
+        <a href="top.html" class="nav-link">Rankings</a>
+        <a href="steam.html" class="nav-link">Steam</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <main class="app-main">
+    <section class="page-header">
+      <div class="page-title-block">
+        <span class="page-eyebrow">Módulo</span>
+        <h1 class="page-title">Gestión de Juegos</h1>
+        <p class="page-subtitle">
+          Crea, edita y administra el catálogo de juegos conectado a tu backend FastAPI.
+        </p>
+      </div>
+      <div>
+        <button id="btn-clear-form" class="btn btn-outline btn-lg">
+          Limpiar formulario
+        </button>
+      </div>
+    </section>
+
+    
+    <section class="grid-2">
+      
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Juego</h2>
+            <p class="card-subtitle">
+              Completa los campos y guarda para crear o actualizar un juego.
+            </p>
+          </div>
+          <span class="badge badge-pill" id="form-mode-label">
+            Modo: creación
+          </span>
+        </header>
+
+        <div class="card-body">
+          <form id="game-form" class="form-grid">
+            <input type="hidden" id="game-id" />
+            <div class="form-group">
+              <label for="nombre" class="form-label">Nombre del juego *</label>
+              <input
+                type="text"
+                id="nombre"
+                placeholder="Ej: Cyber Neon Warriors"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="plataforma" class="form-label">Plataforma</label>
+              <input
+                type="text"
+                id="plataforma"
+                placeholder="Steam/PC, PS5, Xbox..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="desarrollador" class="form-label">Desarrollador</label>
+              <input
+                type="text"
+                id="desarrollador"
+                placeholder="Estudio o compañía"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="genero-principal" class="form-label">Género principal</label>
+              <input
+                type="text"
+                id="genero-principal"
+                placeholder="Shooter, RPG, MOBA..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="categorias-ids" class="form-label">
+                Categorías (IDs separados por coma)
+              </label>
+              <input
+                type="text"
+                id="categorias-ids"
+                placeholder="Ej: 1, 2, 5"
+              />
+              <span class="text-muted" style="font-size: 0.75rem;">
+                Se envían como <code>categorias_ids: List[int]</code> al backend.
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="user-id" class="form-label">Usuario (ID opcional)</label>
+              <input
+                type="number"
+                id="user-id"
+                placeholder="ID del usuario asociado"
+                min="1"
+              />
+            </div>
+
+            <div class="form-group mt-2">
+              <button type="submit" class="btn btn-primary btn-lg glow-pulse" id="btn-submit">
+                GUARDAR JUEGO
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-2" id="form-toast-container"></div>
+        </div>
+      </article>
+
+      
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Listado de Juegos</h2>
+            <p class="card-subtitle">
+              Visualiza, edita o elimina los juegos almacenados en la base de datos.
+            </p>
+          </div>
+          <button id="btn-reload" class="btn btn-ghost btn-sm">
+            Recargar
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>AppID</th>
+                  <th>Nombre</th>
+                  <th>Plataforma</th>
+                  <th>Desarrollador</th>
+                  <th>Género</th>
+                  <th>Categorías</th>
+                  <th>Usuario</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="games-table-body">
+               
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-2 text-muted" id="games-empty-text" style="display:none;">
+            No hay juegos registrados todavía. Crea el primero desde el formulario.
+          </p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="../js/game.js"></script>
+</body>
+</html>
