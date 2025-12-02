@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>GameingTOP | Steam</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="app-shell">
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="navbar-brand">
+        <div class="navbar-logo"></div>
+        <div>
+          <div class="navbar-title">GameingTOP</div>
+          <div class="navbar-subtitle">Neon Control Panel</div>
+        </div>
+      </div>
+      <nav class="navbar-links">
+        <a href="index.html" class="nav-link">Dashboard</a>
+        <a href="game.html" class="nav-link">Juegos</a>
+        <a href="user.html" class="nav-link">Usuarios</a>
+        <a href="top.html" class="nav-link">Rankings</a>
+        <a href="steam.html" class="nav-link active">Steam</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="page-header">
+      <div class="page-title-block">
+        <span class="page-eyebrow">Integración externa</span>
+        <h1 class="page-title">Sincronización con Steam</h1>
+        <p class="page-subtitle">
+          Consulta el Top de juegos desde la API de Steam y visualiza detalles individuales,
+          para apoyar la creación y análisis de tu catálogo en GameingTOP.
+        </p>
+      </div>
+      <div>
+        <button id="btn-load-top-steam" class="btn btn-primary btn-lg glow-pulse">
+          Cargar Top Steam
+        </button>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Detalle de juego de Steam</h2>
+            <p class="card-subtitle">
+              Consulta la información detallada de un juego por su AppID o seleccionándolo desde la tabla.
+            </p>
+          </div>
+        </header>
+
+        <div class="card-body">
+          <form id="steam-search-form" class="form-grid">
+            <div class="form-group">
+              <label for="steam-appid-input" class="form-label">Buscar por AppID</label>
+              <input
+                type="number"
+                id="steam-appid-input"
+                placeholder="Ej: 570 (Dota 2), 730 (CS:GO)"
+                min="1"
+              />
+            </div>
+            <div class="form-group mt-2">
+              <button type="submit" class="btn btn-outline btn-lg" id="btn-search-appid">
+                Ver detalles
+              </button>
+            </div>
+          </form>
+          <div class="mt-2" id="steam-toast-container"></div>
+          <div class="mt-2" id="steam-game-detail">
+            <p class="text-muted">
+              No hay ningún juego seleccionado. Usa la tabla de la derecha o el buscador por AppID.
+            </p>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <header class="card-header">
+          <div>
+            <h2 class="card-title">Top juegos (Steam)</h2>
+            <p class="card-subtitle">
+              Lista de juegos obtenida desde la API oficial de Steam. Haz clic en "Detalle"
+              para ver más información del juego seleccionado.
+            </p>
+          </div>
+          <button id="btn-reload-top-steam" class="btn btn-ghost btn-sm">
+            Recargar
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>AppID</th>
+                  <th>Nombre</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="steam-top-table-body">
+              </tbody>
+            </table>
+          </div>
+
+          <p
+            class="mt-2 text-muted"
+            id="steam-top-empty-text"
+            style="display: none;"
+          >
+            Aún no hemos cargado el Top de Steam. Haz clic en <strong>Cargar Top Steam</strong>.
+          </p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="../js/steam.js"></script>
+</body>
+</html>
