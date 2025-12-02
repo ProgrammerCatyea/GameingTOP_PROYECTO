@@ -9,8 +9,12 @@ router = APIRouter(
 
 @router.get("/top-games")
 def get_top_steam_games():
+    """
+    Obtiene el top de juegos desde la API de Steam,
+    usando la URL configurada en settings.STEAM_TOP_URL.
+    """
     try:
-        response = requests.get(settings.STEAM_TOP_URL)
+        response = requests.get(settings.STEAM_TOP_URL, timeout=10)
         if response.status_code != 200:
             raise HTTPException(
                 status_code=response.status_code,
@@ -24,6 +28,8 @@ def get_top_steam_games():
             "games": games[:25]
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -33,9 +39,16 @@ def get_top_steam_games():
 
 @router.get("/details/{appid}")
 def get_game_details(appid: int):
+    """
+    Obtiene los detalles de un juego específico de Steam por su AppID.
+
+    Usa la misma plantilla de URL que tu servicio api_steam:
+    settings.STEAM_APPDETAILS_URL debe tener algo como:
+    'https://store.steampowered.com/api/appdetails?appids={appid}&l=spanish'
+    """
     try:
-        url = settings.STEAM_APPDETAILS_URL.format(appids=appid)
-        response = requests.get(url)
+        url = settings.STEAM_APPDETAILS_URL.format(appid=appid)
+        response = requests.get(url, timeout=10)
 
         if response.status_code != 200:
             raise HTTPException(
@@ -44,13 +57,15 @@ def get_game_details(appid: int):
             )
 
         data = response.json()
-        game_info = data.get(str(appid), {}).get("data", {})
+        detalle = data.get(str(appid), {})
 
-        if not game_info:
+        if not detalle.get("success"):
             raise HTTPException(
                 status_code=404,
                 detail="Game not found in the Steam API"
             )
+
+        game_info = detalle.get("data", {})
 
         return {
             "id": appid,
@@ -63,6 +78,8 @@ def get_game_details(appid: int):
             "imagen": game_info.get("header_image"),
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
