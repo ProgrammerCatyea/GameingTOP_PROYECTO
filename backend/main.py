@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse   # ⬅️ IMPORTANTE
+from fastapi.responses import RedirectResponse 
+from backend.core.database import Base, engine
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse  
 from backend.core.database import Base, engine
 from backend.routers.game_routes import router as juegos_router
 from backend.routers.category_routes import router as categorias_router
@@ -31,14 +35,15 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
-app.include_router(juegos_router,    prefix="/juegos",    tags=["Juegos"])
+app.include_router(juegos_router,     prefix="/juegos",     tags=["Juegos"])
 app.include_router(categorias_router, prefix="/categorias", tags=["Categorías"])
-app.include_router(rankings_router,  prefix="/rankings",  tags=["Rankings"])
-app.include_router(usuarios_router,  prefix="/usuarios",  tags=["Usuarios"])
-app.include_router(steam_router,     prefix="/steam",     tags=["Steam - Sincronización"])
+app.include_router(rankings_router,   prefix="/rankings",   tags=["Rankings"])
+app.include_router(usuarios_router,   prefix="/usuarios",   tags=["Usuarios"])
+app.include_router(steam_router,      prefix="/steam",      tags=["Steam - Sincronización"])
 
 
-FRONTEND_URL = "https://gameingtop-proyecto-1.onrender.com"
+FRONTEND_URL = "https://gameingtop-proyecto.onrender.com"
+
 
 @app.get("/", include_in_schema=False)
 def inicio():
