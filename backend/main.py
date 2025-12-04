@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse   # ⬅️ IMPORTANTE
 from backend.core.database import Base, engine
 from backend.routers.game_routes import router as juegos_router
 from backend.routers.category_routes import router as categorias_router
@@ -13,10 +14,6 @@ app = FastAPI(
     description="""
     Esta API permite gestionar y analizar información de videojuegos, jugadores, categorías y rankings
     sincronizados con Steam.
-
-    Desarrollado por: Nicolás Lozano Díaz  
-    Tecnologías: FastAPI · SQLAlchemy · SQLite · Pydantic  
-    Objetivo:** Visualizar, crear y relacionar datos de videojuegos populares.
     """,
     contact={
         "name": "Nicolás Lozano Díaz",
@@ -34,7 +31,6 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
-
 app.include_router(juegos_router,    prefix="/juegos",    tags=["Juegos"])
 app.include_router(categorias_router, prefix="/categorias", tags=["Categorías"])
 app.include_router(rankings_router,  prefix="/rankings",  tags=["Rankings"])
@@ -42,8 +38,14 @@ app.include_router(usuarios_router,  prefix="/usuarios",  tags=["Usuarios"])
 app.include_router(steam_router,     prefix="/steam",     tags=["Steam - Sincronización"])
 
 
-@app.get("/", tags=["Estado del Servidor"])
+FRONTEND_URL = "https://gameingtop-proyecto-1.onrender.com"
+
+@app.get("/", include_in_schema=False)
 def inicio():
+    return RedirectResponse(url=FRONTEND_URL)
+
+@app.get("/status", tags=["Estado del Servidor"])
+def status():
     return {
         "status": "ok",
         "mensaje": "Backend GameingTOP operativo correctamente",
