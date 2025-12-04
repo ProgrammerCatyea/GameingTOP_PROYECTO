@@ -2,9 +2,11 @@ fastapi
 uvicorn[standard]
 sqlmodel
 sqlalchemy
+pydantic
 pydantic-settings
 python-dotenv
 typing-extensions
 requests
 python-multipart
 supabase>=2.25.0
+psycopg2-binary
