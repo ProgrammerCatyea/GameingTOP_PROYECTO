@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://gameingtop-proyecto.onrender.com";
 const STEAM_TOP_ENDPOINT = `${API_BASE_URL}/steam/top-games`;
 const STEAM_DETAILS_ENDPOINT = (appid) => `${API_BASE_URL}/steam/details/${appid}`;
 const btnLoadTopSteam = document.getElementById("btn-load-top-steam");

@@ -1,12 +1,7 @@
-
-
-const API_BASE_URL = "http://127.0.0.1:8000";
-
+const API_BASE_URL = "https://gameingtop-proyecto.onrender.com";
 const GAMES_ENDPOINT = `${API_BASE_URL}/juegos`;
 const USERS_ENDPOINT = `${API_BASE_URL}/usuarios`;
 const RANKINGS_ENDPOINT = `${API_BASE_URL}/rankings`;
-
-
 const kpiTotalGames = document.getElementById("kpi-total-games");
 const kpiTotalUsers = document.getElementById("kpi-total-users");
 const kpiTotalRankings = document.getElementById("kpi-total-rankings");

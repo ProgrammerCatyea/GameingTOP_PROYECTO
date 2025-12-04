@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://gameingtop-proyecto.onrender.com";
 const GAMES_ENDPOINT = `${API_BASE_URL}/juegos`;
 const gameForm = document.getElementById("game-form");
 const gameIdInput = document.getElementById("game-id");
