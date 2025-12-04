@@ -20,6 +20,8 @@ let chartRankingsType = null;
 
 
 function showDashboardToast(message, type = "success") {
+  if (!dashboardToastContainer) return;
+
   dashboardToastContainer.innerHTML = "";
 
   const toast = document.createElement("div");
@@ -46,11 +48,11 @@ async function fetchJSON(url) {
   return res.json();
 }
 
+
 async function loadDashboardData() {
-  btnDashboardReload.disabled = true;
+  if (btnDashboardReload) btnDashboardReload.disabled = true;
 
   try {
-
     const [games, users, rankings] = await Promise.all([
       fetchJSON(GAMES_ENDPOINT),
       fetchJSON(USERS_ENDPOINT),
@@ -68,16 +70,16 @@ async function loadDashboardData() {
       "error"
     );
   } finally {
-    btnDashboardReload.disabled = false;
+    if (btnDashboardReload) btnDashboardReload.disabled = false;
   }
 }
 
 
 function updateKPIs(games, users, rankings) {
   // Totales
-  kpiTotalGames.textContent = games.length ?? 0;
-  kpiTotalUsers.textContent = users.length ?? 0;
-  kpiTotalRankings.textContent = rankings.length ?? 0;
+  if (kpiTotalGames) kpiTotalGames.textContent = games.length ?? 0;
+  if (kpiTotalUsers) kpiTotalUsers.textContent = users.length ?? 0;
+  if (kpiTotalRankings) kpiTotalRankings.textContent = rankings.length ?? 0;
 
   const genreCounts = {};
   games.forEach((game) => {
@@ -88,12 +90,12 @@ function updateKPIs(games, users, rankings) {
   });
 
   if (Object.keys(genreCounts).length === 0) {
-    kpiTopGenre.textContent = "-";
+    if (kpiTopGenre) kpiTopGenre.textContent = "-";
     return;
   }
 
   const topGenre = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0][0];
-  kpiTopGenre.textContent = topGenre;
+  if (kpiTopGenre) kpiTopGenre.textContent = topGenre;
 }
 
 
@@ -111,9 +113,9 @@ function updateCharts(games, rankings) {
   if (chartGamesPlatform) chartGamesPlatform.destroy();
 
   if (platforms.length === 0) {
-    chartGamesPlatformEmpty.style.display = "block";
+    if (chartGamesPlatformEmpty) chartGamesPlatformEmpty.style.display = "block";
   } else {
-    chartGamesPlatformEmpty.style.display = "none";
+    if (chartGamesPlatformEmpty) chartGamesPlatformEmpty.style.display = "none";
     chartGamesPlatform = new Chart(chartGamesPlatformCanvas, {
       type: "bar",
       data: {
@@ -158,9 +160,9 @@ function updateCharts(games, rankings) {
   if (chartGamesGenre) chartGamesGenre.destroy();
 
   if (genres.length === 0) {
-    chartGamesGenreEmpty.style.display = "block";
+    if (chartGamesGenreEmpty) chartGamesGenreEmpty.style.display = "block";
   } else {
-    chartGamesGenreEmpty.style.display = "none";
+    if (chartGamesGenreEmpty) chartGamesGenreEmpty.style.display = "none";
     chartGamesGenre = new Chart(chartGamesGenreCanvas, {
       type: "bar",
       data: {
@@ -205,9 +207,9 @@ function updateCharts(games, rankings) {
   if (chartRankingsType) chartRankingsType.destroy();
 
   if (types.length === 0) {
-    chartRankingsTypeEmpty.style.display = "block";
+    if (chartRankingsTypeEmpty) chartRankingsTypeEmpty.style.display = "block";
   } else {
-    chartRankingsTypeEmpty.style.display = "none";
+    if (chartRankingsTypeEmpty) chartRankingsTypeEmpty.style.display = "none";
     chartRankingsType = new Chart(chartRankingsTypeCanvas, {
       type: "bar",
       data: {
@@ -241,10 +243,11 @@ function updateCharts(games, rankings) {
 }
 
 
-btnDashboardReload.addEventListener("click", () => {
-  loadDashboardData();
-});
-
+if (btnDashboardReload) {
+  btnDashboardReload.addEventListener("click", () => {
+    loadDashboardData();
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDashboardData();

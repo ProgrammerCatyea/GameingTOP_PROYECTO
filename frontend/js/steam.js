@@ -13,6 +13,8 @@ const btnSearchAppid = document.getElementById("btn-search-appid");
 
 
 function showSteamToast(message, type = "success") {
+  if (!steamToastContainer) return;
+
   steamToastContainer.innerHTML = "";
 
   const toast = document.createElement("div");
@@ -30,7 +32,10 @@ function showSteamToast(message, type = "success") {
   }, 3500);
 }
 
+
 function renderSteamDetail(detail) {
+  if (!steamGameDetailContainer) return;
+
   if (!detail) {
     steamGameDetailContainer.innerHTML = `
       <p class="text-muted">
@@ -53,9 +58,11 @@ function renderSteamDetail(detail) {
 
   let generosText = "-";
   if (Array.isArray(generos) && generos.length > 0) {
-
     if (typeof generos[0] === "object") {
-      generosText = generos.map((g) => g.description || g.name || "").join(", ");
+      generosText = generos
+        .map((g) => g.description || g.name || "")
+        .filter((g) => g !== "")
+        .join(", ");
     } else {
       generosText = generos.join(", ");
     }
@@ -81,18 +88,27 @@ function renderSteamDetail(detail) {
     <div class="card" style="margin-top: 8px;">
       <div class="card-body">
         <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;">
-          ${imagen ? `
+          ${
+            imagen
+              ? `
           <div>
             <img src="${imagen}" alt="Portada de ${nombre ?? "Juego"}"
               style="max-width:220px; border-radius:16px; display:block;" />
-          </div>` : ""}
+          </div>`
+              : ""
+          }
           <div style="flex:1; min-width:220px;">
-            <h3 style="margin:0 0 6px 0; font-size:1.05rem;">${nombre ?? "Juego sin nombre"}</h3>
+            <h3 style="margin:0 0 6px 0; font-size:1.05rem;">${
+              nombre ?? "Juego sin nombre"
+            }</h3>
             <p class="text-muted" style="margin:0 0 8px 0;">
               AppID: <strong>${id ?? "-"}</strong> · Precio: <strong>${safePrecio}</strong>
             </p>
             <p style="margin:0 0 8px 0; font-size:0.9rem;">
-              ${descripcion ?? "Este juego no tiene una descripción breve disponible."}
+              ${
+                descripcion ??
+                "Este juego no tiene una descripción breve disponible."
+              }
             </p>
             <p style="margin:0 0 4px 0; font-size:0.85rem;">
               <strong>Géneros:</strong> ${generosText || "-"}
@@ -111,10 +127,9 @@ function renderSteamDetail(detail) {
 }
 
 
-
 async function loadSteamTopGames() {
-  btnLoadTopSteam.disabled = true;
-  btnReloadTopSteam.disabled = true;
+  if (btnLoadTopSteam) btnLoadTopSteam.disabled = true;
+  if (btnReloadTopSteam) btnReloadTopSteam.disabled = true;
 
   try {
     const res = await fetch(STEAM_TOP_ENDPOINT);
@@ -123,7 +138,7 @@ async function loadSteamTopGames() {
     }
 
     const data = await res.json();
-    const games = data.games || data; 
+    const games = data.games || data;
 
     renderSteamTopTable(games);
     showSteamToast("Top de Steam cargado correctamente.");
@@ -131,12 +146,14 @@ async function loadSteamTopGames() {
     console.error(error);
     showSteamToast(error.message || "No se pudo cargar el Top de Steam.", "error");
   } finally {
-    btnLoadTopSteam.disabled = false;
-    btnReloadTopSteam.disabled = false;
+    if (btnLoadTopSteam) btnLoadTopSteam.disabled = false;
+    if (btnReloadTopSteam) btnReloadTopSteam.disabled = false;
   }
 }
 
 function renderSteamTopTable(games) {
+  if (!steamTopTableBody || !steamTopEmptyText) return;
+
   steamTopTableBody.innerHTML = "";
 
   if (!games || games.length === 0) {
@@ -186,7 +203,7 @@ async function loadGameDetailsByAppId(appid) {
     return;
   }
 
-  btnSearchAppid.disabled = true;
+  if (btnSearchAppid) btnSearchAppid.disabled = true;
 
   try {
     const res = await fetch(STEAM_DETAILS_ENDPOINT(appid));
@@ -196,11 +213,13 @@ async function loadGameDetailsByAppId(appid) {
       } else {
         showSteamToast("Error al consultar detalles del juego.", "error");
       }
-      steamGameDetailContainer.innerHTML = `
-        <p class="text-muted">
-          No se pudieron obtener los detalles para AppID=${appid}.
-        </p>
-      `;
+      if (steamGameDetailContainer) {
+        steamGameDetailContainer.innerHTML = `
+          <p class="text-muted">
+            No se pudieron obtener los detalles para AppID=${appid}.
+          </p>
+        `;
+      }
       return;
     }
 
@@ -211,38 +230,51 @@ async function loadGameDetailsByAppId(appid) {
     console.error(error);
     showSteamToast(error.message || "No se pudieron cargar los detalles.", "error");
   } finally {
-    btnSearchAppid.disabled = false;
+    if (btnSearchAppid) btnSearchAppid.disabled = false;
   }
 }
 
 
-btnLoadTopSteam.addEventListener("click", () => {
-  loadSteamTopGames();
-});
+if (btnLoadTopSteam) {
+  btnLoadTopSteam.addEventListener("click", () => {
+    loadSteamTopGames();
+  });
+}
 
-btnReloadTopSteam.addEventListener("click", () => {
-  loadSteamTopGames();
-});
+if (btnReloadTopSteam) {
+  btnReloadTopSteam.addEventListener("click", () => {
+    loadSteamTopGames();
+  });
+}
 
-steamSearchForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const appidValue = steamAppidInput.value ? Number(steamAppidInput.value) : null;
-  loadGameDetailsByAppId(appidValue);
-});
+if (steamSearchForm) {
+  steamSearchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const appidValue =
+      steamAppidInput && steamAppidInput.value
+        ? Number(steamAppidInput.value)
+        : null;
+    loadGameDetailsByAppId(appidValue);
+  });
+}
 
-steamTopTableBody.addEventListener("click", (e) => {
-  const button = e.target.closest("button");
-  if (!button) return;
+if (steamTopTableBody) {
+  steamTopTableBody.addEventListener("click", (e) => {
+    const button = e.target.closest("button");
+    if (!button) return;
 
-  const action = button.dataset.action;
-  const appid = button.dataset.appid;
+    const action = button.dataset.action;
+    const appid = button.dataset.appid;
 
-  if (action === "steam-detail" && appid) {
-    loadGameDetailsByAppId(appid);
-  }
-});
+    if (action === "steam-detail" && appid) {
+      loadGameDetailsByAppId(appid);
+    }
+  });
+}
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  steamTopEmptyText.style.display = "block";
+  if (steamTopEmptyText) {
+    steamTopEmptyText.style.display = "block";
+  }
 });

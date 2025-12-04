@@ -1,3 +1,4 @@
+
 const API_BASE_URL = "https://gameingtop-proyecto.onrender.com";
 const GAMES_ENDPOINT = `${API_BASE_URL}/juegos`;
 const gameForm = document.getElementById("game-form");
@@ -18,6 +19,8 @@ const btnSubmit = document.getElementById("btn-submit");
 
 
 function showToast(message, type = "success", container = formToastContainer) {
+  if (!container) return;
+
   container.innerHTML = "";
 
   const toast = document.createElement("div");
@@ -35,23 +38,33 @@ function showToast(message, type = "success", container = formToastContainer) {
   }, 3500);
 }
 
-function clearForm() {
-  gameIdInput.value = "";
-  nombreInput.value = "";
-  plataformaInput.value = "";
-  desarrolladorInput.value = "";
-  generoPrincipalInput.value = "";
-  categoriasIdsInput.value = "";
-  userIdInput.value = "";
 
-  formModeLabel.textContent = "Modo: creación";
-  formModeLabel.classList.remove("badge-soft");
-  formModeLabel.classList.add("badge-pill");
-  btnSubmit.textContent = "Guardar juego";
+function clearForm() {
+  if (!gameIdInput) return;
+
+  gameIdInput.value = "";
+  if (nombreInput) nombreInput.value = "";
+  if (plataformaInput) plataformaInput.value = "";
+  if (desarrolladorInput) desarrolladorInput.value = "";
+  if (generoPrincipalInput) generoPrincipalInput.value = "";
+  if (categoriasIdsInput) categoriasIdsInput.value = "";
+  if (userIdInput) userIdInput.value = "";
+
+  if (formModeLabel) {
+    formModeLabel.textContent = "Modo: creación";
+    formModeLabel.classList.remove("badge-soft");
+    formModeLabel.classList.add("badge-pill");
+  }
+
+  if (btnSubmit) {
+    btnSubmit.textContent = "Guardar juego";
+  }
 }
 
 
 async function fetchGames() {
+  if (!gamesTableBody) return;
+
   try {
     const res = await fetch(GAMES_ENDPOINT);
     if (!res.ok) {
@@ -66,14 +79,16 @@ async function fetchGames() {
 }
 
 function renderGames(games) {
+  if (!gamesTableBody) return;
+
   gamesTableBody.innerHTML = "";
 
   if (!games || games.length === 0) {
-    gamesEmptyText.style.display = "block";
+    if (gamesEmptyText) gamesEmptyText.style.display = "block";
     return;
   }
 
-  gamesEmptyText.style.display = "none";
+  if (gamesEmptyText) gamesEmptyText.style.display = "none";
 
   games.forEach((game) => {
     const {
@@ -127,9 +142,8 @@ function renderGames(games) {
   });
 }
 
-
 function buildGamePayload() {
-  const categoriasIds = categoriasIdsInput.value
+  const categoriasIds = categoriasIdsInput && categoriasIdsInput.value
     ? categoriasIdsInput.value
         .split(",")
         .map((v) => v.trim())
@@ -138,13 +152,19 @@ function buildGamePayload() {
         .filter((n) => !Number.isNaN(n))
     : [];
 
-  const userId = userIdInput.value ? Number(userIdInput.value) : null;
+  const userId = userIdInput && userIdInput.value ? Number(userIdInput.value) : null;
 
   return {
-    nombre: nombreInput.value.trim(),
-    plataforma: plataformaInput.value.trim() || "Steam/PC",
-    desarrollador: desarrolladorInput.value.trim() || null,
-    genero_principal: generoPrincipalInput.value.trim() || null,
+    nombre: nombreInput ? nombreInput.value.trim() : "",
+    plataforma: plataformaInput && plataformaInput.value.trim()
+      ? plataformaInput.value.trim()
+      : "Steam/PC",
+    desarrollador: desarrolladorInput && desarrolladorInput.value.trim()
+      ? desarrolladorInput.value.trim()
+      : null,
+    genero_principal: generoPrincipalInput && generoPrincipalInput.value.trim()
+      ? generoPrincipalInput.value.trim()
+      : null,
     categorias_ids: categoriasIds,
     user_id: userId,
   };
@@ -196,74 +216,83 @@ async function deleteGame(id) {
 }
 
 
-gameForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+if (gameForm) {
+  gameForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const id = gameIdInput.value || null;
+    const id = gameIdInput && gameIdInput.value ? gameIdInput.value : null;
 
-  if (!nombreInput.value.trim()) {
-    showToast("El nombre del juego es obligatorio.", "error");
-    return;
-  }
-
-  const payload = buildGamePayload();
-
-  btnSubmit.disabled = true;
-
-  try {
-    if (id) {
-      await updateGame(id, payload);
-      showToast("Juego actualizado correctamente.");
-    } else {
-      await createGame(payload);
-      showToast("Juego creado correctamente.");
+    if (!nombreInput || !nombreInput.value.trim()) {
+      showToast("El nombre del juego es obligatorio.", "error");
+      return;
     }
 
-    await fetchGames();
-    clearForm();
-  } catch (error) {
-    console.error(error);
-    showToast(error.message || "Ocurrió un error.", "error");
-  } finally {
-    btnSubmit.disabled = false;
-  }
-});
+    const payload = buildGamePayload();
 
-btnReload.addEventListener("click", () => {
-  fetchGames();
-});
-
-btnClearForm.addEventListener("click", () => {
-  clearForm();
-});
-
-gamesTableBody.addEventListener("click", async (e) => {
-  const button = e.target.closest("button");
-  if (!button) return;
-
-  const action = button.dataset.action;
-  const id = button.dataset.id;
-
-  if (!action || !id) return;
-
-  if (action === "edit") {
-    handleEditClick(id);
-  }
-
-  if (action === "delete") {
-    const confirmed = confirm("¿Seguro que deseas eliminar este juego?");
-    if (!confirmed) return;
+    if (btnSubmit) btnSubmit.disabled = true;
 
     try {
-      await deleteGame(id);
-      showToast("Juego eliminado correctamente.");
+      if (id) {
+        await updateGame(id, payload);
+        showToast("Juego actualizado correctamente.");
+      } else {
+        await createGame(payload);
+        showToast("Juego creado correctamente.");
+      }
+
       await fetchGames();
+      clearForm();
     } catch (error) {
       console.error(error);
-      showToast(error.message || "No se pudo eliminar el juego.", "error");
+      showToast(error.message || "Ocurrió un error.", "error");
+    } finally {
+      if (btnSubmit) btnSubmit.disabled = false;
     }
-  }
-});
+  });
+}
+
+if (btnReload) {
+  btnReload.addEventListener("click", () => {
+    fetchGames();
+  });
+}
+
+if (btnClearForm) {
+  btnClearForm.addEventListener("click", () => {
+    clearForm();
+  });
+}
+
+if (gamesTableBody) {
+  gamesTableBody.addEventListener("click", async (e) => {
+    const button = e.target.closest("button");
+    if (!button) return;
+
+    const action = button.dataset.action;
+    const id = button.dataset.id;
+
+    if (!action || !id) return;
+
+    if (action === "edit") {
+      handleEditClick(id);
+    }
+
+    if (action === "delete") {
+      const confirmed = confirm("¿Seguro que deseas eliminar este juego?");
+      if (!confirmed) return;
+
+      try {
+        await deleteGame(id);
+        showToast("Juego eliminado correctamente.");
+        await fetchGames();
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "No se pudo eliminar el juego.", "error");
+      }
+    }
+  });
+}
+
 
 async function handleEditClick(id) {
   try {
@@ -273,26 +302,30 @@ async function handleEditClick(id) {
     }
     const game = await res.json();
 
-    gameIdInput.value = game.id ?? "";
-    nombreInput.value = game.nombre ?? "";
-    plataformaInput.value = game.plataforma ?? "";
-    desarrolladorInput.value = game.desarrollador ?? "";
-    generoPrincipalInput.value = game.genero_principal ?? "";
-    userIdInput.value = game.user_id ?? "";
+    if (gameIdInput) gameIdInput.value = game.id ?? "";
+    if (nombreInput) nombreInput.value = game.nombre ?? "";
+    if (plataformaInput) plataformaInput.value = game.plataforma ?? "";
+    if (desarrolladorInput) desarrolladorInput.value = game.desarrollador ?? "";
+    if (generoPrincipalInput) generoPrincipalInput.value = game.genero_principal ?? "";
+    if (userIdInput) userIdInput.value = game.user_id ?? "";
 
     if (Array.isArray(game.categorias) && game.categorias.length > 0) {
       const ids = game.categorias
         .map((c) => c.id)
         .filter((id) => id != null);
-      categoriasIdsInput.value = ids.join(", ");
-    } else {
+      if (categoriasIdsInput) categoriasIdsInput.value = ids.join(", ");
+    } else if (categoriasIdsInput) {
       categoriasIdsInput.value = "";
     }
 
-    formModeLabel.textContent = "Modo: edición";
-    formModeLabel.classList.remove("badge-pill");
-    formModeLabel.classList.add("badge-soft");
-    btnSubmit.textContent = "Actualizar juego";
+    if (formModeLabel) {
+      formModeLabel.textContent = "Modo: edición";
+      formModeLabel.classList.remove("badge-pill");
+      formModeLabel.classList.add("badge-soft");
+    }
+
+    if (btnSubmit) btnSubmit.textContent = "Actualizar juego";
+
     showToast("Editando juego. Modifica los campos y guarda.");
   } catch (error) {
     console.error(error);
@@ -305,4 +338,3 @@ document.addEventListener("DOMContentLoaded", () => {
   clearForm();
   fetchGames();
 });
-

@@ -17,6 +17,8 @@ const btnSubmitRanking = document.getElementById("btn-submit-ranking");
 
 
 function showRankingToast(message, type = "success") {
+  if (!rankingFormToastContainer) return;
+
   rankingFormToastContainer.innerHTML = "";
 
   const toast = document.createElement("div");
@@ -34,7 +36,10 @@ function showRankingToast(message, type = "success") {
   }, 3500);
 }
 
+
 function setRankingFormCreateMode() {
+  if (!rankingFormModeLabel || !btnSubmitRanking) return;
+
   rankingFormModeLabel.textContent = "Modo: creación";
   rankingFormModeLabel.classList.remove("badge-soft");
   rankingFormModeLabel.classList.add("badge-pill");
@@ -43,6 +48,8 @@ function setRankingFormCreateMode() {
 }
 
 function setRankingFormEditMode() {
+  if (!rankingFormModeLabel || !btnSubmitRanking) return;
+
   rankingFormModeLabel.textContent = "Modo: edición";
   rankingFormModeLabel.classList.remove("badge-pill");
   rankingFormModeLabel.classList.add("badge-soft");
@@ -51,16 +58,17 @@ function setRankingFormEditMode() {
 }
 
 function clearRankingForm() {
-  rankingIdInput.value = "";
-  rankingNombreInput.value = "";
-  rankingDescripcionInput.value = "";
-  rankingTipoSelect.value = "global";
-  rankingUserSelect.value = "";
+  if (rankingIdInput) rankingIdInput.value = "";
+  if (rankingNombreInput) rankingNombreInput.value = "";
+  if (rankingDescripcionInput) rankingDescripcionInput.value = "";
+  if (rankingTipoSelect) rankingTipoSelect.value = "global";
+  if (rankingUserSelect) rankingUserSelect.value = "";
   setRankingFormCreateMode();
 }
 
-
 async function fetchUsersForSelect() {
+  if (!rankingUserSelect) return;
+
   try {
     const res = await fetch(USERS_ENDPOINT);
     if (!res.ok) throw new Error("Error al obtener usuarios");
@@ -86,7 +94,10 @@ async function fetchUsersForSelect() {
   }
 }
 
+
 async function fetchRankings() {
+  if (!rankingsTableBody) return;
+
   try {
     const res = await fetch(RANKINGS_ENDPOINT);
     if (!res.ok) throw new Error("Error al obtener rankings");
@@ -100,14 +111,16 @@ async function fetchRankings() {
 }
 
 function renderRankings(rankings) {
+  if (!rankingsTableBody) return;
+
   rankingsTableBody.innerHTML = "";
 
   if (!rankings || rankings.length === 0) {
-    rankingsEmptyText.style.display = "block";
+    if (rankingsEmptyText) rankingsEmptyText.style.display = "block";
     return;
   }
 
-  rankingsEmptyText.style.display = "none";
+  if (rankingsEmptyText) rankingsEmptyText.style.display = "none";
 
   rankings.forEach((rk) => {
     const {
@@ -149,11 +162,18 @@ function renderRankings(rankings) {
   });
 }
 
+
 function buildRankingPayload() {
-  const nombre = rankingNombreInput.value.trim();
-  const descripcion = rankingDescripcionInput.value.trim() || null;
-  const tipo = rankingTipoSelect.value || "global";
-  const userId = rankingUserSelect.value ? Number(rankingUserSelect.value) : null;
+  const nombre = rankingNombreInput ? rankingNombreInput.value.trim() : "";
+  const descripcion = rankingDescripcionInput && rankingDescripcionInput.value.trim()
+    ? rankingDescripcionInput.value.trim()
+    : null;
+  const tipo = rankingTipoSelect && rankingTipoSelect.value
+    ? rankingTipoSelect.value
+    : "global";
+  const userId = rankingUserSelect && rankingUserSelect.value
+    ? Number(rankingUserSelect.value)
+    : null;
 
   return {
     nombre,
@@ -162,6 +182,7 @@ function buildRankingPayload() {
     user_id: userId,
   };
 }
+
 
 async function createRanking(payload) {
   const res = await fetch(RANKINGS_ENDPOINT, {
@@ -204,73 +225,82 @@ async function deleteRanking(id) {
 }
 
 
-rankingForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
 
-  const id = rankingIdInput.value || null;
+if (rankingForm) {
+  rankingForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  if (!rankingNombreInput.value.trim()) {
-    showRankingToast("El nombre del ranking es obligatorio.", "error");
-    return;
-  }
+    const id = rankingIdInput && rankingIdInput.value ? rankingIdInput.value : null;
 
-  const payload = buildRankingPayload();
-  btnSubmitRanking.disabled = true;
-
-  try {
-    if (id) {
-      await updateRanking(id, payload);
-      showRankingToast("Ranking actualizado correctamente.");
-    } else {
-      await createRanking(payload);
-      showRankingToast("Ranking creado correctamente.");
+    if (!rankingNombreInput || !rankingNombreInput.value.trim()) {
+      showRankingToast("El nombre del ranking es obligatorio.", "error");
+      return;
     }
 
-    await fetchRankings();
-    clearRankingForm();
-  } catch (error) {
-    console.error(error);
-    showRankingToast(error.message || "Ocurrió un error en el ranking.", "error");
-  } finally {
-    btnSubmitRanking.disabled = false;
-  }
-});
-
-btnReloadRankings.addEventListener("click", () => {
-  fetchRankings();
-});
-
-btnClearFormRanking.addEventListener("click", () => {
-  clearRankingForm();
-});
-
-rankingsTableBody.addEventListener("click", async (e) => {
-  const button = e.target.closest("button");
-  if (!button) return;
-
-  const action = button.dataset.action;
-  const id = button.dataset.id;
-
-  if (!action || !id) return;
-
-  if (action === "edit-ranking") {
-    handleEditRankingClick(id);
-  }
-
-  if (action === "delete-ranking") {
-    const confirmed = confirm("¿Seguro que deseas eliminar este ranking?");
-    if (!confirmed) return;
+    const payload = buildRankingPayload();
+    if (btnSubmitRanking) btnSubmitRanking.disabled = true;
 
     try {
-      await deleteRanking(id);
-      showRankingToast("Ranking eliminado correctamente.");
+      if (id) {
+        await updateRanking(id, payload);
+        showRankingToast("Ranking actualizado correctamente.");
+      } else {
+        await createRanking(payload);
+        showRankingToast("Ranking creado correctamente.");
+      }
+
       await fetchRankings();
+      clearRankingForm();
     } catch (error) {
       console.error(error);
-      showRankingToast(error.message || "No se pudo eliminar el ranking.", "error");
+      showRankingToast(error.message || "Ocurrió un error en el ranking.", "error");
+    } finally {
+      if (btnSubmitRanking) btnSubmitRanking.disabled = false;
     }
-  }
-});
+  });
+}
+
+if (btnReloadRankings) {
+  btnReloadRankings.addEventListener("click", () => {
+    fetchRankings();
+  });
+}
+
+if (btnClearFormRanking) {
+  btnClearFormRanking.addEventListener("click", () => {
+    clearRankingForm();
+  });
+}
+
+if (rankingsTableBody) {
+  rankingsTableBody.addEventListener("click", async (e) => {
+    const button = e.target.closest("button");
+    if (!button) return;
+
+    const action = button.dataset.action;
+    const id = button.dataset.id;
+
+    if (!action || !id) return;
+
+    if (action === "edit-ranking") {
+      handleEditRankingClick(id);
+    }
+
+    if (action === "delete-ranking") {
+      const confirmed = confirm("¿Seguro que deseas eliminar este ranking?");
+      if (!confirmed) return;
+
+      try {
+        await deleteRanking(id);
+        showRankingToast("Ranking eliminado correctamente.");
+        await fetchRankings();
+      } catch (error) {
+        console.error(error);
+        showRankingToast(error.message || "No se pudo eliminar el ranking.", "error");
+      }
+    }
+  });
+}
 
 async function handleEditRankingClick(id) {
   try {
@@ -281,15 +311,17 @@ async function handleEditRankingClick(id) {
 
     const rk = await res.json();
 
-    rankingIdInput.value = rk.id ?? "";
-    rankingNombreInput.value = rk.nombre ?? "";
-    rankingDescripcionInput.value = rk.descripcion ?? "";
-    rankingTipoSelect.value = rk.tipo ?? "global";
+    if (rankingIdInput) rankingIdInput.value = rk.id ?? "";
+    if (rankingNombreInput) rankingNombreInput.value = rk.nombre ?? "";
+    if (rankingDescripcionInput) rankingDescripcionInput.value = rk.descripcion ?? "";
+    if (rankingTipoSelect) rankingTipoSelect.value = rk.tipo ?? "global";
 
-    if (rk.user_id) {
-      rankingUserSelect.value = rk.user_id.toString();
-    } else {
-      rankingUserSelect.value = "";
+    if (rankingUserSelect) {
+      if (rk.user_id) {
+        rankingUserSelect.value = rk.user_id.toString();
+      } else {
+        rankingUserSelect.value = "";
+      }
     }
 
     setRankingFormEditMode();

@@ -18,6 +18,8 @@ const btnSubmitUser = document.getElementById("btn-submit-user");
 
 
 function showUserToast(message, type = "success") {
+  if (!userFormToastContainer) return;
+
   userFormToastContainer.innerHTML = "";
 
   const toast = document.createElement("div");
@@ -35,7 +37,10 @@ function showUserToast(message, type = "success") {
   }, 3500);
 }
 
+
 function setFormToCreateMode() {
+  if (!userFormModeLabel || !btnSubmitUser) return;
+
   userFormModeLabel.textContent = "Modo: creación";
   userFormModeLabel.classList.remove("badge-soft");
   userFormModeLabel.classList.add("badge-pill");
@@ -45,6 +50,8 @@ function setFormToCreateMode() {
 }
 
 function setFormToEditMode() {
+  if (!userFormModeLabel || !btnSubmitUser) return;
+
   userFormModeLabel.textContent = "Modo: edición";
   userFormModeLabel.classList.remove("badge-pill");
   userFormModeLabel.classList.add("badge-soft");
@@ -54,19 +61,21 @@ function setFormToEditMode() {
 }
 
 function clearUserForm() {
-  userIdInput.value = "";
-  userNombreInput.value = "";
-  userNicknameInput.value = "";
-  userEmailInput.value = "";
-  userPaisInput.value = "";
-  userEdadInput.value = "";
-  userNivelInput.value = "";
+  if (userIdInput) userIdInput.value = "";
+  if (userNombreInput) userNombreInput.value = "";
+  if (userNicknameInput) userNicknameInput.value = "";
+  if (userEmailInput) userEmailInput.value = "";
+  if (userPaisInput) userPaisInput.value = "";
+  if (userEdadInput) userEdadInput.value = "";
+  if (userNivelInput) userNivelInput.value = "";
 
   setFormToCreateMode();
 }
 
 
 async function fetchUsers() {
+  if (!usersTableBody) return;
+
   try {
     const res = await fetch(USERS_ENDPOINT);
     if (!res.ok) {
@@ -81,14 +90,16 @@ async function fetchUsers() {
 }
 
 function renderUsers(users) {
+  if (!usersTableBody) return;
+
   usersTableBody.innerHTML = "";
 
   if (!users || users.length === 0) {
-    usersEmptyText.style.display = "block";
+    if (usersEmptyText) usersEmptyText.style.display = "block";
     return;
   }
 
-  usersEmptyText.style.display = "none";
+  if (usersEmptyText) usersEmptyText.style.display = "none";
 
   users.forEach((user) => {
     const {
@@ -127,12 +138,22 @@ function renderUsers(users) {
 
 function buildUserPayload() {
   return {
-    nombre: userNombreInput.value.trim(),
-    nickname: userNicknameInput.value.trim() || null,
-    email: userEmailInput.value.trim() || null,
-    pais: userPaisInput.value.trim() || null,
-    edad: userEdadInput.value ? Number(userEdadInput.value) : null,
-    nivel_rol: userNivelInput.value.trim() || null,
+    nombre: userNombreInput ? userNombreInput.value.trim() : "",
+    nickname: userNicknameInput && userNicknameInput.value.trim()
+      ? userNicknameInput.value.trim()
+      : null,
+    email: userEmailInput && userEmailInput.value.trim()
+      ? userEmailInput.value.trim()
+      : null,
+    pais: userPaisInput && userPaisInput.value.trim()
+      ? userPaisInput.value.trim()
+      : null,
+    edad: userEdadInput && userEdadInput.value
+      ? Number(userEdadInput.value)
+      : null,
+    nivel_rol: userNivelInput && userNivelInput.value.trim()
+      ? userNivelInput.value.trim()
+      : null,
   };
 }
 
@@ -182,73 +203,82 @@ async function deleteUser(id) {
 }
 
 
-userForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+if (userForm) {
+  userForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const id = userIdInput.value || null;
+    const id = userIdInput && userIdInput.value ? userIdInput.value : null;
 
-  if (!userNombreInput.value.trim()) {
-    showUserToast("El nombre del usuario es obligatorio.", "error");
-    return;
-  }
-
-  const payload = buildUserPayload();
-  btnSubmitUser.disabled = true;
-
-  try {
-    if (id) {
-      await updateUser(id, payload);
-      showUserToast("Usuario actualizado correctamente.");
-    } else {
-      await createUser(payload);
-      showUserToast("Usuario creado correctamente.");
+    if (!userNombreInput || !userNombreInput.value.trim()) {
+      showUserToast("El nombre del usuario es obligatorio.", "error");
+      return;
     }
 
-    await fetchUsers();
-    clearUserForm();
-  } catch (error) {
-    console.error(error);
-    showUserToast(error.message || "Ocurrió un error.", "error");
-  } finally {
-    btnSubmitUser.disabled = false;
-  }
-});
-
-btnReloadUsers.addEventListener("click", () => {
-  fetchUsers();
-});
-
-btnClearFormUser.addEventListener("click", () => {
-  clearUserForm();
-});
-
-usersTableBody.addEventListener("click", async (e) => {
-  const button = e.target.closest("button");
-  if (!button) return;
-
-  const action = button.dataset.action;
-  const id = button.dataset.id;
-
-  if (!action || !id) return;
-
-  if (action === "edit-user") {
-    handleEditUserClick(id);
-  }
-
-  if (action === "delete-user") {
-    const confirmed = confirm("¿Seguro que deseas eliminar este usuario?");
-    if (!confirmed) return;
+    const payload = buildUserPayload();
+    if (btnSubmitUser) btnSubmitUser.disabled = true;
 
     try {
-      await deleteUser(id);
-      showUserToast("Usuario eliminado correctamente.");
+      if (id) {
+        await updateUser(id, payload);
+        showUserToast("Usuario actualizado correctamente.");
+      } else {
+        await createUser(payload);
+        showUserToast("Usuario creado correctamente.");
+      }
+
       await fetchUsers();
+      clearUserForm();
     } catch (error) {
       console.error(error);
-      showUserToast(error.message || "No se pudo eliminar el usuario.", "error");
+      showUserToast(error.message || "Ocurrió un error.", "error");
+    } finally {
+      if (btnSubmitUser) btnSubmitUser.disabled = false;
     }
-  }
-});
+  });
+}
+
+if (btnReloadUsers) {
+  btnReloadUsers.addEventListener("click", () => {
+    fetchUsers();
+  });
+}
+
+if (btnClearFormUser) {
+  btnClearFormUser.addEventListener("click", () => {
+    clearUserForm();
+  });
+}
+
+if (usersTableBody) {
+  usersTableBody.addEventListener("click", async (e) => {
+    const button = e.target.closest("button");
+    if (!button) return;
+
+    const action = button.dataset.action;
+    const id = button.dataset.id;
+
+    if (!action || !id) return;
+
+    if (action === "edit-user") {
+      handleEditUserClick(id);
+    }
+
+    if (action === "delete-user") {
+      const confirmed = confirm("¿Seguro que deseas eliminar este usuario?");
+      if (!confirmed) return;
+
+      try {
+        await deleteUser(id);
+        showUserToast("Usuario eliminado correctamente.");
+        await fetchUsers();
+      } catch (error) {
+        console.error(error);
+        showUserToast(error.message || "No se pudo eliminar el usuario.", "error");
+      }
+    }
+  });
+}
+
 
 async function handleEditUserClick(id) {
   try {
@@ -258,13 +288,13 @@ async function handleEditUserClick(id) {
     }
     const user = await res.json();
 
-    userIdInput.value = user.id ?? "";
-    userNombreInput.value = user.nombre ?? "";
-    userNicknameInput.value = user.nickname ?? "";
-    userEmailInput.value = user.email ?? "";
-    userPaisInput.value = user.pais ?? "";
-    userEdadInput.value = user.edad ?? "";
-    userNivelInput.value = user.nivel_rol ?? "";
+    if (userIdInput) userIdInput.value = user.id ?? "";
+    if (userNombreInput) userNombreInput.value = user.nombre ?? "";
+    if (userNicknameInput) userNicknameInput.value = user.nickname ?? "";
+    if (userEmailInput) userEmailInput.value = user.email ?? "";
+    if (userPaisInput) userPaisInput.value = user.pais ?? "";
+    if (userEdadInput) userEdadInput.value = user.edad ?? "";
+    if (userNivelInput) userNivelInput.value = user.nivel_rol ?? "";
 
     setFormToEditMode();
     showUserToast("Editando usuario. Modifica los campos y guarda.");
@@ -279,4 +309,3 @@ document.addEventListener("DOMContentLoaded", () => {
   clearUserForm();
   fetchUsers();
 });
-
