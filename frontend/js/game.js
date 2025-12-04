@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "https://gameingtop-proyecto.onrender.com";
+const API_BASE_URL = "https://gameingtop-proyecto-1.onrender.com";
 const GAMES_ENDPOINT = `${API_BASE_URL}/juegos`;
 const gameForm = document.getElementById("game-form");
 const gameIdInput = document.getElementById("game-id");
