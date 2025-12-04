@@ -16,6 +16,7 @@ const btnClearFormRanking = document.getElementById("btn-clear-form-ranking");
 const btnSubmitRanking = document.getElementById("btn-submit-ranking");
 
 
+
 function showRankingToast(message, type = "success") {
   if (!rankingFormToastContainer) return;
 
@@ -65,6 +66,8 @@ function clearRankingForm() {
   if (rankingUserSelect) rankingUserSelect.value = "";
   setRankingFormCreateMode();
 }
+
+
 
 async function fetchUsersForSelect() {
   if (!rankingUserSelect) return;
@@ -129,6 +132,7 @@ function renderRankings(rankings) {
       tipo,
       user_id,
       games,
+      image_url,  
     } = rk;
 
     const numGames = Array.isArray(games) ? games.length : 0;
@@ -156,11 +160,65 @@ function renderRankings(rankings) {
             Eliminar
           </button>
         </div>
+
+        <div class="ranking-image-section" style="margin-top: 0.5rem;">
+          <div class="ranking-image-preview-wrapper" style="margin-bottom: 0.25rem;">
+            ${
+              image_url
+                ? `<img src="${image_url}" alt="Imagen ranking ${nombre ?? ""}" class="ranking-image-preview" style="max-width: 120px; border-radius: 4px;">`
+                : `<span class="no-image-text" style="font-size: 0.8rem; color: #888;">Sin imagen</span>`
+            }
+          </div>
+          <div class="ranking-image-actions">
+            <input 
+              type="file" 
+              accept="image/*" 
+              data-role="ranking-image-input" 
+              data-id="${id}"
+              style="display: none;"
+            >
+            <button 
+              type="button" 
+              class="btn btn-sm btn-secondary" 
+              data-action="open-upload-image" 
+              data-id="${id}"
+            >
+              ${image_url ? "Cambiar imagen" : "Subir imagen"}
+            </button>
+          </div>
+        </div>
       </td>
     `;
+
+    const fileInput = tr.querySelector('input[data-role="ranking-image-input"]');
+    const uploadBtn = tr.querySelector('button[data-action="open-upload-image"]');
+
+    if (uploadBtn && fileInput) {
+      uploadBtn.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+          await uploadRankingImage(id, file);
+          showRankingToast("Imagen subida correctamente.");
+          await fetchRankings();
+        } catch (error) {
+          console.error(error);
+          showRankingToast(error.message || "No se pudo subir la imagen.", "error");
+        } finally {
+          e.target.value = "";
+        }
+      });
+    }
+
     rankingsTableBody.appendChild(tr);
   });
 }
+
 
 
 function buildRankingPayload() {
@@ -182,7 +240,6 @@ function buildRankingPayload() {
     user_id: userId,
   };
 }
-
 
 async function createRanking(payload) {
   const res = await fetch(RANKINGS_ENDPOINT, {
@@ -226,6 +283,26 @@ async function deleteRanking(id) {
 
 
 
+async function uploadRankingImage(id, file) {
+  const url = `${RANKINGS_ENDPOINT}/${id}/image`;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(url, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody.detail || "Error al subir la imagen del ranking.");
+  }
+
+  return res.json();
+}
+
+
 if (rankingForm) {
   rankingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -259,6 +336,7 @@ if (rankingForm) {
     }
   });
 }
+
 
 if (btnReloadRankings) {
   btnReloadRankings.addEventListener("click", () => {
