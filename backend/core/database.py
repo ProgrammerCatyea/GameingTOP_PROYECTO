@@ -1,22 +1,28 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from backend.core.config import settings
+DATABASE_URL = settings.DB_URL or "sqlite:///./gameingtop.db"
 
-DATABASE_URL = settings.get_database_url()
+connect_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
 
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+    connect_args=connect_args,
+    pool_pre_ping=True,
 )
 
 SessionLocal = sessionmaker(
     bind=engine,
     autoflush=False,
-    autocommit=False
+    autocommit=False,
 )
+
 Base = declarative_base()
 
-def get_database():
+def get_db():
     db = SessionLocal()
     try:
         yield db
