@@ -9,5 +9,5 @@ typing-extensions==4.12.2
 requests==2.32.3
 httpx==0.23.3
 python-multipart==0.0.9
-supabase==1.0.0
+supabase>=2.0.0
 pytest==8.3.3
