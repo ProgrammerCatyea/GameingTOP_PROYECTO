@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://gameingtop-proyecto.onrender.com";
+const API_BASE_URL = "https://gameingtop-proyecto-1.onrender.com";
 const GAMES_ENDPOINT = `${API_BASE_URL}/juegos`;
 const USERS_ENDPOINT = `${API_BASE_URL}/usuarios`;
 const RANKINGS_ENDPOINT = `${API_BASE_URL}/rankings`;
