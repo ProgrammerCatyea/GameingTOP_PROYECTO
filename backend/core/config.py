@@ -1,38 +1,28 @@
-from pathlib import Path
-from typing import List
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-
-    PROJECT_NAME: str = "GameingTOP API"
-    VERSION: str = "1.0.0"
-    DESCRIPTION: str = (
-        "API para visualizar y analizar tendencias de videojuegos "
-        "(Steam, Rankings, Categorías y Usuarios)."
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",   
     )
 
-    DB_URL: str = ""
+    env: str = "development"              
+    app_name: str = "GameingTOP"
+    port: int = 8000
 
-    def get_database_url(self):
-        if self.DB_URL:
-            return self.DB_URL
-        BASE_DIR = Path(__file__).resolve().parents[2]
-        DB_PATH = BASE_DIR / "data" / "gamingtop.db"
-        return f"sqlite:///{DB_PATH}"
 
-    ALLOWED_ORIGINS: List[str] = ["*"]
+    database_url: str = "sqlite:///./app.db"
 
-    STEAM_API_KEY: str = ""
-    STEAM_TOP_URL: str = (
-        "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
-    )
-    STEAM_APPDETAILS_URL: str = (
-        "https://store.steampowered.com/api/appdetails?appids={appid}"
-    )
+   
+    supabase_url: str | None = None
+    supabase_anon_key: str | None = None
+    supabase_service_role_key: str | None = None
+    supabase_bucket_name: str | None = "rankings-images"
 
-    class Config:
-        env_file = ".env"
+    frontend_origin: str = "http://localhost:5500"
+
 
 
 settings = Settings()

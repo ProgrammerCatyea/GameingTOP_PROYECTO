@@ -2,7 +2,9 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from backend.core.config import settings
-DATABASE_URL = settings.DB_URL or "sqlite:///./gameingtop.db"
+
+
+DATABASE_URL = settings.database_url or "sqlite:///./gameingtop.db"
 
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
@@ -21,6 +23,7 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+
 
 def get_db():
     db = SessionLocal()
